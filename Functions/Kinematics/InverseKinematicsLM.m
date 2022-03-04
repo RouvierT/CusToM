@@ -98,7 +98,7 @@ else
 end
 
 weights = AnalysisParameters.IK.weights';
-
+weights = ones(1, length(real_markers));
 
 h = waitbar(0,['Inverse Kinematics (' filename ')']);
 % 1st frame : classical optimization

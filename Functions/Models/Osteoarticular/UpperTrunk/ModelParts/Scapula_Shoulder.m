@@ -20,7 +20,6 @@ function [Human_model]= Scapula_Shoulder(Human_model,k,Mass,Side,AttachmentPoint
 % Authors : Antoine Muller, Charles Pontonnier, Pierre Puchaud and
 % Georges Dumont
 %________________________________________________________
-
 %% Solid list
 
 list_solid={'ScapuloThoracic_J1' 'ScapuloThoracic_J2' 'ScapuloThoracic_J3' 'ScapuloThoracic_J4' 'ScapuloThoracic_J5' 'ScapuloThoracic_J6' 'Scapula'};
@@ -86,7 +85,7 @@ Thorax_ShoulderRightNode = k*[-0.0408 0.1099 0.1929]-Thorax_T12L1JointNode;
 Thorax_osim2antoine      = [k k Thorax_ShoulderRightNode(3)/0.17]; 
 
 % ------------------------ Scapula ----------------------------------------
-% Centre of mass location in OpenSim frame
+% Centre of motion location in OpenSim frame
 Scapula_CoM = Thorax_osim2antoine.*Mirror*[-0.054694 -0.035032 -0.043734]';
 % Landmarks location in CusToM frame
 Scapula_ghJointNode = Thorax_osim2antoine.*Mirror*[-0.00955; -0.034; 0.009] - Scapula_CoM;
@@ -115,6 +114,9 @@ Scapula_position_set = {...
     ['MTAC' Cote 'M'], Scapula_cluster_med;...
     ['MTAC' Cote 'B'], Scapula_cluster_mid;...
     ['MTAC' Cote 'L'], Scapula_cluster_lat;...
+    ['SCL' Cote 'L'], Scapula_locator_AA;...
+    ['SCL' Cote 'B'], Scapula_locator_AI;...
+    ['SCL' Cote 'M'], Scapula_locator_TS;...
     'ThoracicEllipsoid_radius', [Thorax_Rx Thorax_Ry Thorax_Rz]';...
     % Muscle paths
     
@@ -165,35 +167,10 @@ Scapula_position_set = {...
     [Side 'Scapula_serr_ant_10-P1'],Thorax_osim2antoine.*Mirror*([-0.0594;0.0017;-0.0897])-Scapula_CoM;...
     [Side 'Scapula_serr_ant_11-P1'],Thorax_osim2antoine.*Mirror*([-0.0513;0.0068;-0.0877])-Scapula_CoM;...
     [Side 'Scapula_serr_ant_12-P1'],Thorax_osim2antoine.*Mirror*([-0.036;0;-0.082])-Scapula_CoM;...
-    [Side 'Scapula_TrapeziusScapula_M-P2'],Thorax_osim2antoine.*Mirror*([-0.0582;-0.0020;-0.0363])-Scapula_CoM;...
-    [Side 'Scapula_TrapeziusScapula_S-P2'],Thorax_osim2antoine.*Mirror*([-0.0517;0.0069;-0.0244])-Scapula_CoM;...
-    [Side 'Scapula_TrapeziusScapula_I-P2'],Thorax_osim2antoine.*Mirror*([-0.0757;-0.0095;-0.0739])-Scapula_CoM;...
+    
+    % Wraps
     };
     
-if ~isempty(varargin)
-    Scapulalocator = varargin{1};
-    Scapulalocator = Scapulalocator{1, 1};
-    if Scapulalocator.active
-        if ~isempty(find(strcmp(Scapulalocator.side,Side),1))
-            vec_1 = Scapula_locator_AA - Scapula_locator_AI;
-            vec_2 = Scapula_locator_TS - Scapula_locator_AI;
-            normal= Sign*cross(vec_1,vec_2)/norm(cross(vec_1,vec_2));
-            ind = find(strcmp(Scapulalocator.side,Side),1);
-            Scapula_locator_AA = Scapula_locator_AA + Scapulalocator.height(ind)*normal*1e-2;
-            Scapula_locator_AI = Scapula_locator_AI + Scapulalocator.height(ind)*normal*1e-2;
-            Scapula_locator_TS = Scapula_locator_TS + Scapulalocator.height(ind)*normal*1e-2;
-            
-            Scapula_position_set =  [Scapula_position_set ; ...
-            {['ScapLoc_AA_' Side]}, {Scapula_locator_AA};...
-            {['ScapLoc_AI_' Side]}, {Scapula_locator_AI};...
-            {['ScapLoc_TS_' Side]}, {Scapula_locator_TS};...
-            ];
-            
-        end
-    end
-end
-
-
 
 %%                     Scaling inertial parameters
 
@@ -328,7 +305,7 @@ Human_model(incr_solid).KinematicsCut=[];           % kinematic cut
 Human_model(incr_solid).linear_constraint=[];
 Human_model(incr_solid).Visual=0;
 Human_model(incr_solid).FunctionalAngle=[Side name];
-Human_model(incr_solid).comment='Scapula abduction - adduction';
+Human_model(incr_solid).comment='Scapulothoracic ellipsoid latitude';
 
 
 % ScapuloThoracic_J5
@@ -347,7 +324,7 @@ Human_model(incr_solid).ActiveJoint=1;
 Human_model(incr_solid).m=0;                        % Reference mass
 Human_model(incr_solid).b=[0 0 0]';        % Attachment point position in mother's frame
 Human_model(incr_solid).I=zeros(3,3);               % Reference inertia matrix
-Human_model(incr_solid).c=[0 0 0]';                 % Centre of mass position in local frame
+Human_model(incr_solid).c=-Scapula_stJointNode;                 % Centre of mass position in local frame
 Human_model(incr_solid).calib_k_constraint=[];
 Human_model(incr_solid).u=[];                       % fixed rotation with respect to u axis of theta angle
 Human_model(incr_solid).theta=[];
@@ -355,7 +332,7 @@ Human_model(incr_solid).KinematicsCut=[];           % kinematic cut
 Human_model(incr_solid).linear_constraint=[];
 Human_model(incr_solid).Visual=0;
 Human_model(incr_solid).FunctionalAngle=[Side name];
-Human_model(incr_solid).comment='Scapula elevation - depression';
+Human_model(incr_solid).comment='Scapulothoracic ellipsoid longitude';
 
 
 % ScapuloThoracic_J6
