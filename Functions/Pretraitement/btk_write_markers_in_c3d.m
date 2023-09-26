@@ -79,7 +79,7 @@ for marqueurNum=1:length(marqueursNoms)
     marqueurCoord = structureNouveauMarkers.(marqueursNoms{marqueurNum});
     marqueurType = 'marker';
     marqueurNom= char(marqueursNoms{marqueurNum});
-    [points, pointsInfo] = btkAppendPoint(hOriginal,marqueurType,marqueurNom,marqueurCoord);
+    btkAppendPoint(hOriginal,marqueurType,marqueurNom,marqueurCoord);
 
 end
 

@@ -64,11 +64,11 @@ for i_marqueur = 1:size(Marqueurs,1)
     st_marqueurs_cine.(Marqueurs{i_marqueur}) = Data_output;
 end
 
-% 4. Extrapolation sur les bords
-
-for i_marqueur = 1:size(Marqueurs,1)
-    st_marqueurs_cine.(Marqueurs{i_marqueur}) = extrapolation_petits_trous_bords(st_marqueurs_cine.(Marqueurs{i_marqueur}),taille_trou);
-end
+% % 4. Extrapolation sur les bords
+% 
+% for i_marqueur = 1:size(Marqueurs,1)
+%     st_marqueurs_cine.(Marqueurs{i_marqueur}) = extrapolation_petits_trous_bords(st_marqueurs_cine.(Marqueurs{i_marqueur}),taille_trou);
+% end
 
 % 5. On enlève les marqueurs où il reste des NaN
 % ratio_NaN=0.3;
