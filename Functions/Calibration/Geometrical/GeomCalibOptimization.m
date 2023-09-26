@@ -8,8 +8,8 @@ ik_function_objective=@(qvar)CostFunctionSymbolicCalib(qvar,k_init,Base_position
 
 nonlcon=@(qvar)ClosedLoopCalib(Base_position{f},Base_rotation{f},qvar,k_init); % testé!
 
-options1 = optimoptions(@fmincon,'Algorithm','interior-point','Display','off','TolFun',1e-4,'MaxFunEvals',2e5,'MaxIter',2e5);
-options2 = optimoptions(@fmincon,'Algorithm','interior-point','Display','off','TolFun',1e-6,'MaxFunEvals',2e9,'MaxIter',2e9);
+options1 = optimoptions(@fmincon,'Algorithm','interior-point','Display','off','TolFun',1e-6,'TolCon',1e-6,'MaxFunEvals',2e5,'MaxIter',2e5);
+options2 = optimoptions(@fmincon,'Algorithm','interior-point','Display','off','TolFun',1e-6,'TolCon',1e-6,'MaxFunEvals',2e9,'MaxIter',2e9);
 h = waitbar(0,['First iteration of Inverse Kinematics']);
 
 [q_value{1}(:,f)] = fmincon(ik_function_objective,q0,[],[],Aeq_ik,beq_ik,l_inf,l_sup,nonlcon,options1);
@@ -19,7 +19,7 @@ h = waitbar(0,['First iteration of Inverse Kinematics']);
 optionsLM = optimset('Algorithm','Levenberg-Marquardt','Display','off','MaxIter',4e6,'MaxFunEval',5e6,'TolFun',1e-4);
 
 buteehandle = @(q)  Limits(q,l_inf,l_sup);
-gamma = 150;
+gamma = 100;
 zeta = 20;
 waitbar(f/nb_frame_calib)
 q_inter = zeros(Nb_qred,nb_frame_calib);
