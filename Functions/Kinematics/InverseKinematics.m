@@ -4,7 +4,7 @@ function [] = InverseKinematics(AnalysisParameters,varargin)
 %   biomechanical model
 %
 %	Based on:
-% 	- Lu, T. W., & O�connor, J. J. (1999). 
+% 	- Lu, T. W., & O�connor, J. J. (1999).
 %	Bone position estimation from skin marker co-ordinates using global optimisation with joint constraints. Journal of biomechanics, 32(2), 129-134.
 %
 %   INPUT
@@ -37,11 +37,11 @@ if numel(AnalysisParameters.filename)==1
     i=1;
     if isequal(AnalysisParameters.General.InputData, @MVNX_V3) % Load inverse kinematics from a MVNX
         MVNXInverseKinematics(AnalysisParameters.filename{i}(1:end-(numel(AnalysisParameters.General.Extension)-1)), AnalysisParameters);
-   else
+    else
         filename = AnalysisParameters.filename{i}(1:end-(numel(AnalysisParameters.General.Extension)-1));
-       if AnalysisParameters.IK.Method == 1
-           [ExperimentalData, InverseKinematicsResults] = InverseKinematicsOpti(filename,AnalysisParameters,BiomechanicalModel); % Optimization method
-       elseif AnalysisParameters.IK.Method == 2
+        if AnalysisParameters.IK.Method == 1
+            [ExperimentalData, InverseKinematicsResults] = InverseKinematicsOpti(filename,AnalysisParameters,BiomechanicalModel); % Optimization method
+        elseif AnalysisParameters.IK.Method == 2
             [ExperimentalData, InverseKinematicsResults] = InverseKinematicsLM(filename,AnalysisParameters,BiomechanicalModel); % Levenberg-Marquardt algorithm
         end
 
@@ -49,21 +49,24 @@ if numel(AnalysisParameters.filename)==1
         SaveDataIK(filename,ExperimentalData,InverseKinematicsResults);
     end
 else
-parfor i = 1:numel(AnalysisParameters.filename)
-    if isequal(AnalysisParameters.General.InputData, @MVNX_V3) % Load inverse kinematics from a MVNX
-        MVNXInverseKinematics(AnalysisParameters.filename{i}(1:end-(numel(AnalysisParameters.General.Extension)-1)), AnalysisParameters);
-   else
-        filename = AnalysisParameters.filename{i}(1:end-(numel(AnalysisParameters.General.Extension)-1));
-       if AnalysisParameters.IK.Method == 1
-           [ExperimentalData, InverseKinematicsResults] = InverseKinematicsOpti(filename,AnalysisParameters,BiomechanicalModel); % Optimization method
-       elseif AnalysisParameters.IK.Method == 2
-            [ExperimentalData, InverseKinematicsResults] = InverseKinematicsLM(filename,AnalysisParameters,BiomechanicalModel); % Levenberg-Marquardt algorithm
-        end
+    parfor i = 1:numel(AnalysisParameters.filename)
+        if isequal(AnalysisParameters.General.InputData, @MVNX_V3) % Load inverse kinematics from a MVNX
+            MVNXInverseKinematics(AnalysisParameters.filename{i}(1:end-(numel(AnalysisParameters.General.Extension)-1)), AnalysisParameters);
+        else
+            filename = AnalysisParameters.filename{i}(1:end-(numel(AnalysisParameters.General.Extension)-1));
+            if AnalysisParameters.IK.Method == 1
+                [ExperimentalData, InverseKinematicsResults] = InverseKinematicsOpti(filename,AnalysisParameters,BiomechanicalModel); % Optimization method
+            elseif AnalysisParameters.IK.Method == 2
+                heure_debut = datetime('now');
+                [ExperimentalData, InverseKinematicsResults] = InverseKinematicsLM(filename,AnalysisParameters,BiomechanicalModel); % Levenberg-Marquardt algorithm
+                heure_fin = datetime('now');
+                ComputationTime = heure_fin-heure_debut;
+            end
 
-        % Save data
-        SaveDataIK(filename,ExperimentalData,InverseKinematicsResults);
+            % Save data
+            SaveDataIK(filename,ExperimentalData,InverseKinematicsResults);
+        end
     end
-end
 end
 
 end
