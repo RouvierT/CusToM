@@ -2,8 +2,8 @@ clear all
 close all
 %% Entrée
 rep_entree = uigetdir('','Selectionner le dossier où les données à traiter sont stockées'); %Dossier contenant les dossiers pour chaque subject après pré-traitement (DonneesTraitees)
-path_prot = uigetfile('','Selectionner le fichier prot.OS du modèle de marqueurs');
 cd(rep_entree)
+path_prot = uigetfile('.protOS','Selectionner le fichier prot.OS du modèle de marqueurs');
 reserved_dir_without_info_global = {'.','..','.DS_Store','info_global','Info_global','Info_Global','modele','fichiers_wrl','Statique','MvtsFonctionnels','resultats_globaux','Events'} ; % pour enlever les dossiers fantômes .,..,DS_store (mac)
 list_subject = dir(rep_entree);
 list_subject = { list_subject.name };
