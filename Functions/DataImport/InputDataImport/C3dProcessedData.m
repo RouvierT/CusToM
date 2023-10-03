@@ -134,7 +134,14 @@ end
 [list_missing_markers_in_c3d]=setdiff(list_markers,[real_markers.name]');
 
 if ~isempty(list_missing_markers_in_c3d)
-disp(['Markerset have not been extracted enterely from the .c3d file, missing markers : ' ;list_missing_markers_in_c3d])
+    disp(['Markerset have not been extracted enterely from the .c3d file, missing markers : ' ;list_missing_markers_in_c3d])
+    ind_missing_marker = find(ismember(list_markers, list_missing_markers_in_c3d));
+    for i_ind = 1:length(ind_missing_marker)
+        missing_marker.name = list_missing_markers_in_c3d(i_ind);
+        missing_marker.position_c3d = NaN(length(real_markers(1).position_c3d),3);
+        missing_marker.weight = 0;
+        real_markers = [real_markers(1:ind_missing_marker(i_ind)-1), missing_marker, real_markers(ind_missing_marker(i_ind):end)];
+    end
 end
 
 %% creating time
