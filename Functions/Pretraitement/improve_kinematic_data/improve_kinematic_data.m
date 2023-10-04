@@ -6,7 +6,7 @@ Marqueurs = fieldnames(st_marqueurs_cine);
 if nargin > 2
     %filtrage par fenêtre glissante par residual analysis
     if strcmp(type_filtre,'FA')
-        st_marqueurs_cine = filtre_adaptatif(st_marqueurs_cine,2,frequence_vicon,crop_inf,crop_sup); %filtre de BW d'ordre 2
+        st_marqueurs_cine = filtre_adaptatif(st_marqueurs_cine,2,frequence_vicon); %filtre de BW d'ordre 2
     %filtrage par moyenne glissante
     else
         n_mg = 5;
@@ -24,8 +24,8 @@ else
         Data = st_marqueurs_cine.(Marqueurs{i_marqueur});
         for i_col = 1:3
             Data(:,i_col)=fct_moyenne_glissante(Data(:,i_col),n_mg);
-            st_marqueurs_cine.(Marqueurs{i_marqueur}) = Data ;
         end
+        st_marqueurs_cine.(Marqueurs{i_marqueur}) = Data ;
     end
 end
 %1. interpolation si petit trous et filtrage
@@ -52,8 +52,8 @@ for i_seg=1:nb_seg
     catch
         disp(['!!! Erreur recalage rigide pour ',cur_seg,', marqueurs manquants dans le c3d !!!'])
     end
-    
-    
+
+
 end
 
 % 3. Re interpolation si petits trous
