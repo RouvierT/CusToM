@@ -34,6 +34,7 @@ Lastframe=btkGetLastFrame(h); % last frame
 nb_frame=Lastframe-Firstframe+1;  % frames count
 
 prefixInfo = btkGetMetaData(h);
+btkDeleteAcquisition(h);
 % prefix = [prefixInfo.children.SUBJECTS.children.NAMES.info.values{1} '_'];
 
 ListMarkersName = fieldnames(markers);
