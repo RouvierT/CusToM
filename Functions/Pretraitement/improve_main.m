@@ -47,7 +47,7 @@ for i_subject = 1:length(list_subject)
                 st_marqueurs_cine = improve_kinematic_data(st_marqueurs_cine, lire_fichier_prot_2(path_prot));
             end
             s = char(list_c3d{i_c3d});
-            btk_write_markers_in_c3d(h, st_marqueurs_cine, h);%,'units','mm','subject_name','SV01AR')
+            btk_write_markers_in_c3d(h, st_marqueurs_cine, h);
             clear st_marqueurs_cine VICON_cine
             disp([list_c3d{i_c3d},' : fin'])
         end

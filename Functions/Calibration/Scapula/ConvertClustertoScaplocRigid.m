@@ -1,4 +1,4 @@
-function [new_name]=ConvertClustertoScaplocRigid(filename_trial, filename_ne, token_mean)
+function [new_name]=ConvertClustertoScaplocRigid(filename_trial, filename_ne, token_mean,side)
 
 %% Open files
     subject = char(filename_trial(1:6));
@@ -13,51 +13,64 @@ function [new_name]=ConvertClustertoScaplocRigid(filename_trial, filename_ne, to
 %% Get positions of clusters and scaploc in filename arr and filename av 
     % Trial cluster
     names_trial = fieldnames(markers_trial);
-    prefix_trial = names_trial{contains(names_trial,'MTACDB')};
+    prefix_trial = names_trial{contains(names_trial,['SCAP' side 'B'])};
     prefix_trial = prefix_trial(1:6);  
-    if strcmp(prefix_trial,'MTACDB')
+    if strcmp(prefix_trial,['SCAP' side 'B'])
         prefix_trial='';
     else
         prefix_trial = [prefix_trial '_'];
     end
-    SCAPDB_trial=markers_trial.([prefix_trial 'MTACDB']);
+    SCAPDB_trial=markers_trial.([prefix_trial 'SCAP' side 'B']);
     nb_frame = size(SCAPDB_trial,1);
     SCAPDB_trial = reshape(SCAPDB_trial, [nb_frame 1 3]);
     SCAPDB_trial = permute(SCAPDB_trial, [3,2,1]);
-    SCAPDH_trial = markers_trial.([prefix_trial 'MTACDM']);
+    SCAPDH_trial = markers_trial.([prefix_trial 'SCAP' side 'H']);
     SCAPDH_trial = reshape(SCAPDH_trial, [nb_frame 1 3]);
     SCAPDH_trial = permute(SCAPDH_trial, [3,2,1]);
-    SCAPDL_trial = markers_trial.([prefix_trial 'MTACDL']);
+    SCAPDL_trial = markers_trial.([prefix_trial 'SCAP' side 'L']);
     SCAPDL_trial = reshape(SCAPDL_trial, [nb_frame 1 3]);
     SCAPDL_trial = permute(SCAPDL_trial, [3,2,1]);
 
     % Neutral cluster
     names_ne = fieldnames(markers_ne);
-    prefix_ne = names_ne{contains(names_ne,'MTACDB')};
+    prefix_ne = names_ne{contains(names_ne,['SCAP' side 'B'])};
     prefix_ne = prefix_ne(1:6);
-     if strcmp(prefix_ne,'MTACDB')
+     if strcmp(prefix_ne,['SCAP' side 'B'])
         prefix_ne='';
     else
         prefix_ne = [prefix_ne '_'];
     end
-    SCAPDB_ne=markers_ne.([prefix_ne 'MTACDB']);
-    SCAPDH_ne=markers_ne.([prefix_ne 'MTACDM']);
-    SCAPDL_ne=markers_ne.([prefix_ne 'MTACDL']);
+    SCAPDB_ne=markers_ne.([prefix_ne 'SCAP' side 'B']);
+    SCAPDH_ne=markers_ne.([prefix_ne 'SCAP' side 'H']);
+    SCAPDL_ne=markers_ne.([prefix_ne 'SCAP' side 'L']);
     % Neutral scaploc
-    SCAPLOCB_ne=markers_ne.('ScapLoc_SCLB');
-    SCAPLOCMM_ne=markers_ne.('ScapLoc_SCLM');
-    SCAPLOCLM_ne=markers_ne.('ScapLoc_SCLL');
+    % Rear scaploc
+try
+    prefix_scaploc = names_arr{contains(names_arr,['Scaploc_B' side])};
+    prefix_scaploc = prefix_scaploc(1:end-9);
+catch
+    prefix_scaploc='';
+end
+try
+    SCAPLOCB_ne=markers_ne.([prefix_scaploc 'SCAPLOCB']);
+    SCAPLOCMM_ne=markers_ne.([prefix_scaploc 'SCAPLOCMM']);
+    SCAPLOCLM_ne=markers_ne.([prefix_scaploc 'SCAPLOCLM']);
+catch
+    SCAPLOCB_ne=markers_ne.([prefix_scaploc 'B']);
+    SCAPLOCMM_ne=markers_ne.([prefix_scaploc 'MM']);
+    SCAPLOCLM_ne=markers_ne.([prefix_scaploc 'LM']);
+end
     
 %% Mean the positions of the markers to reduce noise on static poses
     if token_mean==1
         % Neutral cluster    
-        SCAPDB_ne=mean(SCAPDB_ne);
-        SCAPDH_ne=mean(SCAPDH_ne);
-        SCAPDL_ne=mean(SCAPDL_ne);
+        SCAPDB_ne=nanmean(SCAPDB_ne);
+        SCAPDH_ne=nanmean(SCAPDH_ne);
+        SCAPDL_ne=nanmean(SCAPDL_ne);
         % Neutral scaploc
-        SCAPLOCB_ne=mean(SCAPLOCB_ne);
-        SCAPLOCMM_ne=mean(SCAPLOCMM_ne);
-        SCAPLOCLM_ne=mean(SCAPLOCLM_ne);
+        SCAPLOCB_ne=nanmean(SCAPLOCB_ne);
+        SCAPLOCMM_ne=nanmean(SCAPLOCMM_ne);
+        SCAPLOCLM_ne=nanmean(SCAPLOCLM_ne);
     else
         % Neutral cluster    
         SCAPDB_ne=SCAPDB_ne(1,:);
@@ -129,7 +142,7 @@ function [new_name]=ConvertClustertoScaplocRigid(filename_trial, filename_ne, to
     pn_trial=btkGetPointNumber(h_trial);
     % Adding virtual SCAPLOC markers to list of markers
     pn_new=pn_trial+3;
-    labels=[ListMarkersName_trial; {'SCAPLOCB';'SCAPLOCMM';'SCAPLOCLM'}];
+    labels=[ListMarkersName_trial; {['SCAPLOCB' side];['SCAPLOCMM' side];['SCAPLOCLM' side]}];
     % Number of frames in trial
     nb_frame_trial=btkGetLastFrame(h_trial)-btkGetFirstFrame(h_trial)+1;
     % Trial acquisition frequency
@@ -157,6 +170,10 @@ function [new_name]=ConvertClustertoScaplocRigid(filename_trial, filename_ne, to
     btkSetPoint(h_new, pn_new, SCAPLOCLM_trial);
     
     % Write and save c3d
-    new_name=[char(filename_trial(1:end-4)) '_scaplocRigid.c3d'];
+    new_name=[char(filename_trial(1:end-4)) '.c3d'];
     btkWriteAcquisition(h_new, new_name);
+    btkCloseAcquisition(h_new);
+    btkCloseAcquisition(h_trial);
+    btkCloseAcquisition(h_ne);
+    
 end
