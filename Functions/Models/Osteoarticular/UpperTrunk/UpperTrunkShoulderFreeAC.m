@@ -36,9 +36,9 @@ function [OsteoArticularModel]= UpperTrunkShoulderFreeAC(OsteoArticularModel,k,M
 [OsteoArticularModel] = Thorax_Shoulder(OsteoArticularModel,k,Mass,AttachmentPoint);
 
 % Right-sided shoulder solids
-[OsteoArticularModel] = Clavicle_Shoulder(OsteoArticularModel,k,Mass,'R','Thorax_scjJointRightNode');
-[OsteoArticularModel] = Scapula_Shoulder_FreeAC(OsteoArticularModel,k,Mass,'R','R_Thorax_EllipsoidNode',varargin);
+[OsteoArticularModel] = Clavicle_Shoulder_FreeAC(OsteoArticularModel,k,Mass,'R','Thorax_scjJointRightNode');
+[OsteoArticularModel] = Scapula_Shoulder_Tangent(OsteoArticularModel,k,Mass,'R','R_Thorax_EllipsoidNode',varargin);
 
 % Left-sided shoulder solids
-[OsteoArticularModel] = Clavicle_Shoulder(OsteoArticularModel,k,Mass,'L','Thorax_scjJointLeftNode');
-[OsteoArticularModel] = Scapula_Shoulder_FreeAC(OsteoArticularModel,k,Mass,'L','L_Thorax_EllipsoidNode',varargin);
+[OsteoArticularModel] = Clavicle_Shoulder_FreeAC(OsteoArticularModel,k,Mass,'L','Thorax_scjJointLeftNode');
+[OsteoArticularModel] = Scapula_Shoulder_Tangent(OsteoArticularModel,k,Mass,'L','L_Thorax_EllipsoidNode',varargin);
