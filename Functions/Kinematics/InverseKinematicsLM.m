@@ -69,7 +69,8 @@ end
 
 %% Inverse kinematics frame per frame
 
-options1 = optimoptions(@fmincon,'Algorithm','interior-point','Display','off','TolFun',1e-6,'TolCon',1e-6,'MaxFunEvals',2e5,'MaxIter',2e5,'TolX',1e-9,'SpecifyObjectiveGradient',true,'DerivativeCheck','off');
+options1 = optimoptions(@fmincon,'Algorithm','interior-point','Display','off','TolFun',1e-6,'TolCon',1e-6,'MaxFunEvals',4e5,'MaxIter',4e5,'TolX',1e-12,'SpecifyObjectiveGradient',true,'DerivativeCheck','off');
+gs = GlobalSearch('Display','off');
 q=zeros(nb_solid,nb_frame);
 ceq=zeros(6*nbClosedLoop,nb_frame);
 addpath('Symbolic_function')
@@ -116,7 +117,7 @@ J_marqueurs_handle = @(q,pcut,Rcut) JacobianMarker(q,pcut,Rcut,Jfq,indexesNumeri
                                                                   indexesNumericJcutq ,nonNumericJcutq, Jcutcut , indexesNumericJcutcut , nonNumericJcutcut);
        
 
-h = waitbar(0,['Inverse Kinematics (' filename ')']);
+% h = waitbar(0,['Inverse Kinematics (' filename ')']);
 % 1st frame : classical optimization
 buteehandle = @(q)  Limits(q,l_inf1,l_sup1);
 gamma = 100;
@@ -128,21 +129,24 @@ if ~isfield(BiomechanicalModel,'ClosedLoopData')
     if isfield(BiomechanicalModel,'GeometricalCalibration') &&  isfield(BiomechanicalModel.GeometricalCalibration,'q0') 
         q0 = BiomechanicalModel.GeometricalCalibration.q0;
     else
-    q0=zeros(nb_solid,1);
+        q0=zeros(nb_solid,1);
     end
     positions = zeros(3, length(real_markers));
     % Precomputation of markers positions at each frame
     for m=1:length(real_markers)
         positions(:,m) = real_markers(m).position(1,:)';
     end
-    
     ik_function_objective=@(qvar)CostFunctionSymbolicIK2(qvar,positions(:),weights,J_marqueurs_handle);
-    [q(:,1)] = fmincon(ik_function_objective,q0,[],[],Aeq_ik,beq_ik,l_inf1,l_sup1,[],options1);
+
+    problem = createOptimProblem('fmincon','x0',q0,'objective',ik_function_objective,'lb',l_inf1,'ub',l_sup1,'Aeq',Aeq_ik,'beq',beq_ik,'options',options1);
+    % [q(:,1)] = fmincon(ik_function_objective,q0,[],[],Aeq_ik,beq_ik,l_inf1,l_sup1,[],options1);
+    [q(:,1),~] = run(gs,problem);
     hclosedloophandle = {@(x) Aeq_ik*x - beq_ik}   ;
 else
-   q0=zeros(nb_solid,1);
     if isfield(BiomechanicalModel,'GeometricalCalibration') &&  isfield(BiomechanicalModel.GeometricalCalibration,'q0')
         q0 = BiomechanicalModel.GeometricalCalibration.q0;
+    else 
+        q0=zeros(nb_solid,1);
     end
     positions = zeros(3, length(real_markers));
     % Precomputation of markers positions at each frame
@@ -169,11 +173,11 @@ for f = 2:nb_frame
     fun = @(q) CostFunctionLM(q,positions(:),gamma,hclosedloophandle,zeta,buteehandle,weights,l_inf1,l_sup1,Aeq_ik,J_marqueurs_handle);
     [q(:,f)] = lsqnonlin(fun,q(:,f-1),[],[],optionsLM);
     
-    waitbar(f/nb_frame)
+    % waitbar(f/nb_frame)
     
 end
 
-close(h)
+% close(h)
 
 
 %% Data processing

@@ -40,10 +40,18 @@ SCAPDL_trial = permute(SCAPDL_trial, [3,2,1]);
 C7_trial=markers_trial.([prefix_trial 'C7']);
 C7_trial = reshape(C7_trial, [nb_frame 1 3]);
 C7_trial = permute(C7_trial, [3,2,1]);
-MAN_trial = markers_trial.([prefix_trial 'MAN']);
+try
+    MAN_trial = markers_trial.([prefix_trial 'MAN']);
+catch
+    MAN_trial = markers_trial.([prefix_trial 'XYP']);
+end
 MAN_trial = reshape(MAN_trial, [nb_frame 1 3]);
 MAN_trial = permute(MAN_trial, [3,2,1]);
-T8_trial = markers_trial.([prefix_trial 'T8']);
+try
+    T8_trial = markers_trial.([prefix_trial 'T8']);
+catch
+    T8_trial = markers_trial.([prefix_trial 'T12']);
+end
 T8_trial = reshape(T8_trial, [nb_frame 1 3]);
 T8_trial = permute(T8_trial, [3,2,1]);
 
@@ -60,8 +68,16 @@ SCAPDH_arr=markers_arr.([prefix_arr 'SCAP' side 'H']);
 SCAPDL_arr=markers_arr.([prefix_arr 'SCAP' side 'L']);
 %THORAX ARRIERE
 C7_arr=markers_arr.([prefix_arr 'C7']);
-MAN_arr=markers_arr.([prefix_arr 'MAN']);
-T8_arr=markers_arr.([prefix_arr 'T8']);
+try
+    MAN_arr=markers_arr.([prefix_arr 'MAN']);
+catch
+    MAN_arr=markers_arr.([prefix_arr 'XYP']);
+end
+try
+    T8_arr=markers_arr.([prefix_arr 'T8']);
+catch
+    T8_arr=markers_arr.([prefix_arr 'T12']);
+end
 
 
 % Rear scaploc
@@ -93,8 +109,16 @@ SCAPDL_av=markers_av.([prefix_av 'SCAP' side 'L']);
 
 %THORAX AVANT
 C7_av=markers_av.([prefix_av 'C7']);
-MAN_av=markers_av.([prefix_av 'MAN']);
-T8_av=markers_av.([prefix_av 'T8']);
+try
+    MAN_av=markers_av.([prefix_av 'MAN']);
+catch
+    MAN_av=markers_av.([prefix_av 'XYP']);
+end
+try
+    T8_av=markers_av.([prefix_av 'T8']);
+catch
+    T8_av=markers_av.([prefix_av 'T12']);
+end
 % Advanced scaploc
 
 try
